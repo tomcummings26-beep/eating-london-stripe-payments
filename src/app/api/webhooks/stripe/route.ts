@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Missing Stripe signature' }, { status: 400 })
   }
 
-  // Get raw body as text for signature verification
+  // Get raw body as text (needed for signature verification)
   const rawBody = await req.text()
   console.log('🔍 Raw webhook body:', rawBody)
 
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
   console.log('📩 Event received:', event.type)
 
-  // Create Supabase client only after verification
+  // ✅ Create Supabase client only after verification
   const supabase = createClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -39,10 +39,11 @@ export async function POST(req: Request) {
       const session = event.data.object as any
       console.log('🧾 Session object:', JSON.stringify(session, null, 2))
 
-      const email = session.customer_email
-      const priceId = session.metadata?.price_id // Stripe is sending `price_id`
+      // Fallback to customer_details.email if customer_email is null
+      const email = session.customer_email || session.customer_details?.email
+      const priceId = session.metadata?.price_id // snake_case
 
-      console.log(`✅ Payment completed for ${email}, priceId: ${priceId}`)
+      console.log(`✅ Payment completed. Email: ${email}, PriceId: ${priceId}`)
 
       let creditsToAdd = 0
       if (priceId === process.env.STRIPE_PRICE_ONE_ALERT) creditsToAdd = 1
@@ -62,7 +63,7 @@ export async function POST(req: Request) {
           console.log(`✨ Successfully incremented credits for ${email}`)
         }
       } else {
-        console.log('ℹ️ No email or creditsToAdd was 0 — skipping credit increment.')
+        console.log('ℹ️ Skipped increment — missing email or no matching priceId.')
       }
     } else {
       console.log(`Unhandled event type: ${event.type}`)
@@ -75,7 +76,7 @@ export async function POST(req: Request) {
   }
 }
 
-// Important: disable body parsing
+// 🚨 Important: disable body parsing so raw body can be verified
 export const config = {
   api: {
     bodyParser: false,
