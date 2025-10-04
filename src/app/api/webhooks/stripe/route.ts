@@ -10,17 +10,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Missing Stripe signature' }, { status: 400 })
   }
 
-  const body = await req.text()
-  let event: Stripe.Event
+  // Get raw body as text for signature verification
+  const rawBody = await req.text()
+  console.log('🔍 Raw webhook body:', rawBody)
 
+  let event: Stripe.Event
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
+    event = stripe.webhooks.constructEvent(
+      rawBody,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET!
+    )
   } catch (err: any) {
     console.error('⚠️ Webhook signature verification failed.', err.message)
     return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 })
   }
 
-  // ✅ create supabase client at runtime
+  console.log('📩 Event received:', event.type)
+
+  // Create Supabase client only after verification
   const supabase = createClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -29,10 +37,12 @@ export async function POST(req: Request) {
   try {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as any
-      const email = session.customer_email
-      const priceId = session.metadata?.priceId
+      console.log('🧾 Session object:', JSON.stringify(session, null, 2))
 
-      console.log(`✅ Payment completed for ${email}, price: ${priceId}`)
+      const email = session.customer_email
+      const priceId = session.metadata?.price_id // Stripe is sending `price_id`
+
+      console.log(`✅ Payment completed for ${email}, priceId: ${priceId}`)
 
       let creditsToAdd = 0
       if (priceId === process.env.STRIPE_PRICE_ONE_ALERT) creditsToAdd = 1
@@ -46,22 +56,28 @@ export async function POST(req: Request) {
           p_amount: creditsToAdd,
         })
 
-        if (error) console.error('❌ Error incrementing credits:', error.message)
-        else console.log(`✨ Successfully incremented credits for ${email}`)
+        if (error) {
+          console.error('❌ Error incrementing credits:', error.message)
+        } else {
+          console.log(`✨ Successfully incremented credits for ${email}`)
+        }
+      } else {
+        console.log('ℹ️ No email or creditsToAdd was 0 — skipping credit increment.')
       }
     } else {
-      console.log(`Unhandled event type ${event.type}`)
+      console.log(`Unhandled event type: ${event.type}`)
     }
 
     return NextResponse.json({ received: true })
   } catch (err: any) {
-    console.error('❌ Webhook error', err)
+    console.error('❌ Webhook handler error', err)
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
 
+// Important: disable body parsing
 export const config = {
   api: {
-    bodyParser: false, // required for raw body
+    bodyParser: false,
   },
 }
