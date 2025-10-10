@@ -5,7 +5,7 @@ import sgMail from '@sendgrid/mail'
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!)
 
 export async function sendPurchaseConfirmation(email: string, credits: number) {
-  const templatePath = path.join(process.cwd(), 'src/app/emails/purchaseConfirmation.html')
+  const templatePath = path.join(process.cwd(), 'public/emails/purchaseConfirmation.html')
   let html = fs.readFileSync(templatePath, 'utf8')
 
   // simple replacements
