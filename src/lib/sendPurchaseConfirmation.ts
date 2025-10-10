@@ -15,7 +15,7 @@ const templateHtml = `
   <table width="100%" style="max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 32px;">
     <tr>
       <td align="center">
-        <img src="https://eating.london/logo-eating-london.png" alt="Eating London" width="160" style="margin-bottom: 24px;" />
+        <img src="https://raw.githubusercontent.com/tomcummings26-beep/eating-london-assets/main/eating-london.png" alt="Eating London" width="160" style="margin-bottom: 24px;" />
         <h2 style="margin: 0 0 12px 0;">Thank you for your purchase 🎉</h2>
         <p style="margin: 0 0 16px 0; color: #666;">
           Your alert credits have now been <strong>added to your account</strong>.
