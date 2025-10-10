@@ -43,7 +43,7 @@ export async function sendPurchaseConfirmation(email: string, credits: number) {
     await sgMail.send({
       to: email,
       from: 'alerts@eating.london', // ✅ verified sender in SendGrid
-      subject: '🎉 Your Eating London credits are now active',
+      subject: '🎉 Your eating.london credits are now active',
       html,
     })
 
