@@ -9,15 +9,16 @@ function AlertSubmittedInner() {
   const params = useSearchParams()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
-  const [showThankYou, setShowThankYou] = useState<boolean>(false)
+  const [status, setStatus] = useState<string | null>(null)
 
   useEffect(() => {
     async function checkLatestAlert() {
       try {
         const email = params.get('email')
+
         if (!email) {
-          // No email param – default to thank you screen
-          setShowThankYou(true)
+          console.warn('⚠️ No email param provided — showing thank-you by default.')
+          setStatus('active') // safe fallback
           setLoading(false)
           return
         }
@@ -33,23 +34,26 @@ function AlertSubmittedInner() {
 
         if (!res.ok) {
           console.error('⚠️ Failed to fetch latest alert status:', res.status)
-          setShowThankYou(true)
+          setStatus('active') // default fallback
           setLoading(false)
           return
         }
 
         const data = await res.json()
-        const latestStatus = data?.status || 'active'
+        const latestStatus = data?.status || 'none'
+        console.log(`📬 Latest alert status for ${cleanEmail}: ${latestStatus}`)
 
-        // ✅ Logic: if "pending_payment" → redirect to upgrade
+        // ✅ Redirect logic
         if (latestStatus === 'pending_payment') {
+          // Redirect to upgrade page if user has no credits
           router.replace('/upgrade')
         } else {
-          setShowThankYou(true)
+          // Otherwise, show thank-you screen
+          setStatus(latestStatus)
         }
       } catch (err) {
         console.error('❌ Error checking latest alert status:', err)
-        setShowThankYou(true)
+        setStatus('active') // fallback to thank-you
       } finally {
         setLoading(false)
       }
@@ -58,7 +62,7 @@ function AlertSubmittedInner() {
     checkLatestAlert()
   }, [params, router])
 
-  // 🌀 Loading state
+  // 🌀 Loading screen
   if (loading) {
     return (
       <div className="p-10 text-center text-gray-500 animate-pulse">
@@ -67,46 +71,42 @@ function AlertSubmittedInner() {
     )
   }
 
-  // 🪄 Thank-you screen
-  if (showThankYou) {
-    return (
-      <main className="min-h-screen flex flex-col items-center justify-center bg-neutral-50 px-6 text-center">
-        <Link href="/" className="mb-8 flex items-center">
-          <Image
-            src="/logo-eating-london.svg"
-            alt="Eating London"
-            width={180}
-            height={48}
-            priority
-          />
-        </Link>
+  // 💳 Redirect case handled above — just render thank-you for everything else
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center bg-neutral-50 px-6 text-center">
+      <Link href="/" className="mb-8 flex items-center">
+        <Image
+          src="/logo-eating-london.svg"
+          alt="Eating London"
+          width={180}
+          height={48}
+          priority
+        />
+      </Link>
 
-        <div className="bg-white shadow-md border border-neutral-200 rounded-2xl p-8 max-w-md w-full space-y-5">
-          <h1 className="text-2xl font-semibold text-neutral-800">
-            Alert Created 🎉
-          </h1>
-          <p className="text-neutral-600 leading-relaxed">
-            Thank you! Your alert has been created.
-          </p>
-          <p className="text-neutral-600">
-            We’ll notify you as soon as a table becomes available.
-          </p>
-          <Link
-            href="/dashboard"
-            className="block w-full bg-blue-600 text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition"
-          >
-            View Your Dashboard
-          </Link>
-        </div>
-
-        <p className="mt-10 text-xs text-neutral-400">
-          eating.london© {new Date().getFullYear()}
+      <div className="bg-white shadow-md border border-neutral-200 rounded-2xl p-8 max-w-md w-full space-y-5">
+        <h1 className="text-2xl font-semibold text-neutral-800">
+          Alert Created 🎉
+        </h1>
+        <p className="text-neutral-600 leading-relaxed">
+          Thank you! Your alert has been created.
         </p>
-      </main>
-    )
-  }
+        <p className="text-neutral-600">
+          We’ll notify you as soon as a table becomes available.
+        </p>
+        <Link
+          href="/dashboard"
+          className="block w-full bg-blue-600 text-white font-medium py-3 rounded-lg hover:bg-blue-700 transition"
+        >
+          View Your Dashboard
+        </Link>
+      </div>
 
-  return null
+      <p className="mt-10 text-xs text-neutral-400">
+        eating.london© {new Date().getFullYear()}
+      </p>
+    </main>
+  )
 }
 
 export default function AlertSubmittedPage() {
