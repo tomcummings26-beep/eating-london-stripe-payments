@@ -39,7 +39,9 @@ export default function Dashboard() {
   const [session, setSession] = useState<any>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [alerts, setAlerts] = useState<Alert[]>([])
-  const [tab, setTab] = useState<'overview' | 'alerts' | 'history' | 'billing' | 'settings'>('overview')
+  const [tab, setTab] = useState<
+    'overview' | 'alerts' | 'history' | 'billing' | 'settings'
+  >('overview')
   const [loading, setLoading] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -71,7 +73,8 @@ export default function Dashboard() {
           headers: { Authorization: `Bearer ${session.access_token}` },
         })
 
-        if (!alertsRes.ok) throw new Error(`API error: ${await alertsRes.text()}`)
+        if (!alertsRes.ok)
+          throw new Error(`API error: ${await alertsRes.text()}`)
         const alertsData = await alertsRes.json()
 
         console.log('📦 Alerts fetched from API:', alertsData)
@@ -88,7 +91,8 @@ export default function Dashboard() {
     fetchData()
   }, [session])
 
-  if (loading) return <div className="p-8 text-gray-500">Loading dashboard...</div>
+  if (loading)
+    return <div className="p-8 text-gray-500">Loading dashboard...</div>
 
   // ✅ Helpers
   const parseDate = (d?: string | Date) => {
@@ -120,7 +124,11 @@ export default function Dashboard() {
       const isFuture = end ? end >= now : start ? start >= now : false
       return a.status === 'active' && hasValidDate && isFuture
     })
-    .sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt ?? 0).getTime() -
+        new Date(a.createdAt ?? 0).getTime()
+    )
 
   const historyAlerts = alerts
     .filter((a) => {
@@ -133,7 +141,11 @@ export default function Dashboard() {
         (a.status === 'active' && hasValidDate && isPast)
       )
     })
-    .sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt ?? 0).getTime() -
+        new Date(a.createdAt ?? 0).getTime()
+    )
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -164,9 +176,22 @@ export default function Dashboard() {
         } md:translate-x-0 fixed md:static z-40 bg-white border-r w-64 p-6 flex flex-col justify-between transition-transform duration-300 ease-in-out h-full md:h-auto`}
       >
         <div>
-          <h2 className="text-lg font-semibold mb-6 text-gray-800 hidden md:block">
-            Your Dashboard
-          </h2>
+          {/* Header section */}
+          <div className="mb-6 flex items-center justify-between">
+            {/* Desktop heading */}
+            <h2 className="text-lg font-semibold text-gray-800 hidden md:block">
+              Your Dashboard
+            </h2>
+
+            {/* Mobile logo link */}
+            <a href="/" className="md:hidden flex items-center gap-2">
+              <img
+                src="/logo-eating-london.svg"
+                alt="eating.london"
+                className="h-5 opacity-90 hover:opacity-100 transition"
+              />
+            </a>
+          </div>
 
           <nav className="space-y-2">
             {tabs.map(({ id, label, icon: Icon }) => (
@@ -245,21 +270,27 @@ export default function Dashboard() {
         {tab === 'alerts' && (
           <div className="space-y-3">
             <h2 className="text-xl font-semibold mb-2">Active Alerts</h2>
-            {activeAlerts.length === 0 && <p className="text-gray-500">No active alerts yet.</p>}
+            {activeAlerts.length === 0 && (
+              <p className="text-gray-500">No active alerts yet.</p>
+            )}
             {activeAlerts.map((a) => (
               <div
                 key={a._id}
                 className="border rounded-md bg-white shadow-sm p-4 flex justify-between items-center"
               >
                 <div>
-                  <p className="font-medium capitalize">{renderRestaurantName(a)}</p>
+                  <p className="font-medium capitalize">
+                    {renderRestaurantName(a)}
+                  </p>
                   <p className="text-sm text-gray-600">
                     {a.dateRange?.start
                       ? new Date(a.dateRange.start).toLocaleDateString()
                       : 'No date set'}{' '}
                     ·{' '}
                     {a.timeRange?.start
-                      ? `${a.timeRange.start}${a.timeRange.end ? `–${a.timeRange.end}` : ''}`
+                      ? `${a.timeRange.start}${
+                          a.timeRange.end ? `–${a.timeRange.end}` : ''
+                        }`
                       : 'Any time'}
                   </p>
                   {a.createdAt && (
@@ -287,14 +318,18 @@ export default function Dashboard() {
                     className="border rounded-md bg-white shadow-sm p-4 flex justify-between items-center"
                   >
                     <div>
-                      <p className="font-medium capitalize">{renderRestaurantName(a)}</p>
+                      <p className="font-medium capitalize">
+                        {renderRestaurantName(a)}
+                      </p>
                       <p className="text-sm text-gray-600">
                         {a.dateRange?.start
                           ? new Date(a.dateRange.start).toLocaleDateString()
                           : 'No date set'}{' '}
                         ·{' '}
                         {a.timeRange?.start
-                          ? `${a.timeRange.start}${a.timeRange.end ? `–${a.timeRange.end}` : ''}`
+                          ? `${a.timeRange.start}${
+                              a.timeRange.end ? `–${a.timeRange.end}` : ''
+                            }`
                           : 'Any time'}
                       </p>
                       {a.createdAt && (
@@ -303,7 +338,9 @@ export default function Dashboard() {
                         </p>
                       )}
                     </div>
-                    <p className="text-xs text-gray-500 capitalize">{a.status}</p>
+                    <p className="text-xs text-gray-500 capitalize">
+                      {a.status}
+                    </p>
                   </li>
                 ))}
               </ul>
@@ -314,4 +351,3 @@ export default function Dashboard() {
     </div>
   )
 }
-
