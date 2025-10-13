@@ -1,12 +1,13 @@
 'use client'
 
 import { Suspense, useEffect, useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 
 function AlertSubmittedInner() {
   const params = useSearchParams()
+  const pathParams = useParams() // 👈 for /alert-submitted/[email]
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [status, setStatus] = useState<string | null>(null)
@@ -14,19 +15,25 @@ function AlertSubmittedInner() {
   useEffect(() => {
     async function checkLatestAlertWithSmartRetry() {
       try {
-        const email = params.get('email')
+        // ✅ Detect email from query (?email=) or path (/alert-submitted/[email])
+        const queryEmail = params.get('email')
+        const pathEmail = (pathParams?.email as string) || null
+        const email = queryEmail || pathEmail
+
         if (!email) {
-          console.warn('⚠️ No email param provided — showing thank-you by default.')
+          console.warn('⚠️ No email param found — showing thank-you by default.')
           setStatus('active')
           setLoading(false)
           return
         }
 
-        const cleanEmail = email.trim().toLowerCase()
+        const cleanEmail = decodeURIComponent(email.trim().toLowerCase())
         const baseUrl = process.env.NEXT_PUBLIC_ALERTS_API_BASE_URL
 
         // 1️⃣ Get the current latest alert before redirect (so we know what's "old")
-        const prevRes = await fetch(`${baseUrl}/api/alerts/latest?email=${encodeURIComponent(cleanEmail)}`)
+        const prevRes = await fetch(
+          `${baseUrl}/api/alerts/latest?email=${encodeURIComponent(cleanEmail)}`
+        )
         const prevData = await prevRes.json()
         const prevStatus = prevData?.status || 'none'
         const prevCreatedAt = prevData?.createdAt || null
@@ -41,7 +48,9 @@ function AlertSubmittedInner() {
         let latestCreatedAt = prevCreatedAt
 
         while (attempt < maxAttempts) {
-          const res = await fetch(`${baseUrl}/api/alerts/latest?email=${encodeURIComponent(cleanEmail)}`)
+          const res = await fetch(
+            `${baseUrl}/api/alerts/latest?email=${encodeURIComponent(cleanEmail)}`
+          )
           const data = await res.json()
 
           latestStatus = data?.status || 'none'
@@ -52,8 +61,6 @@ function AlertSubmittedInner() {
           )
 
           // ✅ Conditions to stop waiting:
-          //  - pending_payment (always redirect)
-          //  - new alert inserted (different createdAt)
           if (
             latestStatus === 'pending_payment' ||
             (latestCreatedAt && latestCreatedAt !== prevCreatedAt)
@@ -83,7 +90,7 @@ function AlertSubmittedInner() {
     }
 
     checkLatestAlertWithSmartRetry()
-  }, [params, router])
+  }, [params, pathParams, router])
 
   // 🌀 Loading state
   if (loading) {
