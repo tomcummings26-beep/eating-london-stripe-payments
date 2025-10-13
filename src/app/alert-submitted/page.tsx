@@ -31,25 +31,27 @@ function AlertSubmittedInner() {
         const cleanEmail = decodeURIComponent(email.trim().toLowerCase())
         const baseUrl = process.env.NEXT_PUBLIC_ALERTS_API_BASE_URL
 
-        // 1️⃣ Get current latest alert (to know what existed before)
+        // 1️⃣ Get the current latest alert
         const prevRes = await fetch(
           `${baseUrl}/api/alerts/latest?email=${encodeURIComponent(cleanEmail)}`
         )
         const prevData = await prevRes.json()
         const prevStatus = prevData?.status || 'none'
         const prevCreatedAt = prevData?.createdAt || null
+        const createdMs = prevCreatedAt ? new Date(prevCreatedAt).getTime() : 0
+        const ageMs = Date.now() - createdMs
 
-        console.log(`📦 Previous alert: status=${prevStatus}, createdAt=${prevCreatedAt || 'none'}`)
+        console.log(`📦 Latest alert: status=${prevStatus}, age=${ageMs}ms`)
 
-        // 🆕 2️⃣ If this is the user’s *first* alert → skip delay entirely
-        if (prevStatus === 'none') {
-          console.log('🆕 First-time user — showing thank-you immediately.')
+        // 🆕 Instant thank-you for brand new alerts (very fresh or none)
+        if (prevStatus === 'none' || (prevStatus === 'active' && ageMs < 3000)) {
+          console.log('🆕 First-time alert detected — instant thank-you.')
           setStatus('active')
           setLoading(false)
           return
         }
 
-        // 3️⃣ Otherwise, retry logic for returning users
+        // 2️⃣ Otherwise, retry for returning users
         const maxAttempts = 7
         const delay = 1000
         let attempt = 0
@@ -69,7 +71,7 @@ function AlertSubmittedInner() {
             `🔁 [Attempt ${attempt + 1}] status=${latestStatus}, createdAt=${latestCreatedAt || 'none'}`
           )
 
-          // ✅ Stop if a new alert appeared or it's pending_payment
+          // ✅ Stop early if a new alert appeared or it's pending_payment
           if (
             latestStatus === 'pending_payment' ||
             (latestCreatedAt && latestCreatedAt !== prevCreatedAt)
@@ -81,7 +83,7 @@ function AlertSubmittedInner() {
           await new Promise((r) => setTimeout(r, delay))
         }
 
-        // 4️⃣ Handle outcomes
+        // 3️⃣ Redirect or show success
         if (latestStatus === 'pending_payment') {
           console.log('💳 Redirecting to /upgrade')
           setRedirecting(true)
@@ -162,4 +164,3 @@ export default function AlertSubmittedPage() {
     </Suspense>
   )
 }
-
