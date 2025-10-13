@@ -215,7 +215,7 @@ export default function Dashboard() {
       {menuOpen && (
         <div
           onClick={() => setMenuOpen(false)}
-          className="fixed inset-0 bg-black bg-opacity-30 md:hidden z-30"
+          className="fixed inset-0 md:hidden z-30 backdrop-blur-sm bg-white/20"
         ></div>
       )}
 
