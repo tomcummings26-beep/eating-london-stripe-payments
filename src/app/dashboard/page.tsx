@@ -156,20 +156,21 @@ export default function Dashboard() {
   ]
 
   // ✅ Layout
-  return (
-{/* Mobile Header */}
-<div className="md:hidden flex items-center justify-between p-4 bg-white border-b">
-  {/* Left side: logo + title */}
-  <div className="flex items-center gap-2">
-    <a href="/" className="flex items-center">
-      <img
-        src="/logo-eating-london.svg"
-        alt="eating.london"
-        className="h-5 opacity-90 hover:opacity-100 transition"
-      />
-    </a>
-    <h1 className="text-lg font-semibold">Dashboard</h1>
-  </div>
+return (
+  <div className="flex min-h-screen bg-gray-50 flex-col md:flex-row">
+    {/* Mobile Header */}
+    <div className="md:hidden flex items-center justify-between p-4 bg-white border-b">
+      {/* Left side: logo + title */}
+      <div className="flex items-center gap-2">
+        <a href="/" className="flex items-center">
+          <img
+            src="/logo-eating-london.svg"
+            alt="eating.london"
+            className="h-5 opacity-90 hover:opacity-100 transition"
+          />
+        </a>
+        <h1 className="text-lg font-semibold">Dashboard</h1>
+      </div>
 
   {/* Right side: menu button */}
   <button
