@@ -4,18 +4,28 @@ import Navigation from '../components/Navigation'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { usePathname } from 'next/navigation'
-import { useState, ReactNode } from 'react'
+import { useEffect, useState, ReactNode } from 'react'
 
 type Props = {
   children: ReactNode
 }
 
-// ✅ Create Supabase client once (persists between reloads)
 const supabaseClient = createBrowserSupabaseClient()
 
 export default function ClientLayout({ children }: Props) {
   const pathname = usePathname()
-  const hideNav = pathname.startsWith('/dashboard')
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    // detect mobile once on mount + window resize
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Hide nav on mobile dashboard only
+  const hideNav = isMobile && pathname.startsWith('/dashboard')
 
   return (
     <SessionContextProvider supabaseClient={supabaseClient}>
