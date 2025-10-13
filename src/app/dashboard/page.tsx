@@ -157,8 +157,7 @@ export default function Dashboard() {
 
   // ✅ Layout
 return (
-  <div className="<div className="flex min-h-screen bg-gray-50 flex-col md:flex-row md:pt-16">
-">
+  <div className="flex min-h-screen bg-gray-50 flex-col md:flex-row md:pt-16">
     {/* Mobile Header */}
     <div className="md:hidden flex items-center justify-between p-4 bg-white border-b">
       {/* Left side: logo + title */}
