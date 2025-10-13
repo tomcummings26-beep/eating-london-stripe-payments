@@ -7,9 +7,10 @@ import Link from 'next/link'
 
 function AlertSubmittedInner() {
   const params = useSearchParams()
-  const pathParams = useParams() // 👈 for /alert-submitted/[email]
+  const pathParams = useParams()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [redirecting, setRedirecting] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
 
   useEffect(() => {
@@ -30,7 +31,7 @@ function AlertSubmittedInner() {
         const cleanEmail = decodeURIComponent(email.trim().toLowerCase())
         const baseUrl = process.env.NEXT_PUBLIC_ALERTS_API_BASE_URL
 
-        // 1️⃣ Get the current latest alert before redirect (so we know what's "old")
+        // 1️⃣ Get current latest alert (to know what existed before)
         const prevRes = await fetch(
           `${baseUrl}/api/alerts/latest?email=${encodeURIComponent(cleanEmail)}`
         )
@@ -40,7 +41,15 @@ function AlertSubmittedInner() {
 
         console.log(`📦 Previous alert: status=${prevStatus}, createdAt=${prevCreatedAt || 'none'}`)
 
-        // 2️⃣ Retry logic to detect *new* alert or pending_payment
+        // 🆕 2️⃣ If this is the user’s *first* alert → skip delay entirely
+        if (prevStatus === 'none') {
+          console.log('🆕 First-time user — showing thank-you immediately.')
+          setStatus('active')
+          setLoading(false)
+          return
+        }
+
+        // 3️⃣ Otherwise, retry logic for returning users
         const maxAttempts = 7
         const delay = 1000
         let attempt = 0
@@ -60,7 +69,7 @@ function AlertSubmittedInner() {
             `🔁 [Attempt ${attempt + 1}] status=${latestStatus}, createdAt=${latestCreatedAt || 'none'}`
           )
 
-          // ✅ Conditions to stop waiting:
+          // ✅ Stop if a new alert appeared or it's pending_payment
           if (
             latestStatus === 'pending_payment' ||
             (latestCreatedAt && latestCreatedAt !== prevCreatedAt)
@@ -72,9 +81,10 @@ function AlertSubmittedInner() {
           await new Promise((r) => setTimeout(r, delay))
         }
 
-        // 3️⃣ Decide based on final state
+        // 4️⃣ Handle outcomes
         if (latestStatus === 'pending_payment') {
           console.log('💳 Redirecting to /upgrade')
+          setRedirecting(true)
           router.replace('/upgrade')
           return
         }
@@ -92,8 +102,8 @@ function AlertSubmittedInner() {
     checkLatestAlertWithSmartRetry()
   }, [params, pathParams, router])
 
-  // 🌀 Loading state
-  if (loading) {
+  // 🌀 Loading or redirecting
+  if (loading || redirecting) {
     return (
       <div className="p-10 text-center text-gray-500 animate-pulse">
         Checking your alert status…
@@ -152,3 +162,4 @@ export default function AlertSubmittedPage() {
     </Suspense>
   )
 }
+
