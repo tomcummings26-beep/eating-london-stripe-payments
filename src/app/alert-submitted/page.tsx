@@ -12,7 +12,7 @@ function AlertSubmittedInner() {
   const [status, setStatus] = useState<string | null>(null)
 
   useEffect(() => {
-    async function checkLatestAlert() {
+    async function checkLatestAlertWithRetry() {
       try {
         const email = params.get('email')
 
@@ -24,33 +24,45 @@ function AlertSubmittedInner() {
         }
 
         const cleanEmail = email.trim().toLowerCase()
+        const maxAttempts = 5 // retry up to 5 times
+        const delay = 1000 // 1s between retries
+        let attempt = 0
+        let latestStatus = 'none'
 
-        // ✅ Fetch latest alert status from Railway API
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_ALERTS_API_BASE_URL}/api/alerts/latest?email=${encodeURIComponent(
-            cleanEmail
-          )}`
-        )
+        // 🔁 Retry loop — wait for Mongo insert to exist
+        while (attempt < maxAttempts) {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_ALERTS_API_BASE_URL}/api/alerts/latest?email=${encodeURIComponent(
+              cleanEmail
+            )}`
+          )
 
-        if (!res.ok) {
-          console.error('⚠️ Failed to fetch latest alert status:', res.status)
-          setStatus('active') // default fallback
-          setLoading(false)
-          return
+          if (!res.ok) {
+            console.error('⚠️ Failed to fetch latest alert status:', res.status)
+            break
+          }
+
+          const data = await res.json()
+          latestStatus = data?.status || 'none'
+
+          console.log(`🔁 [Attempt ${attempt + 1}] Latest alert for ${cleanEmail}: ${latestStatus}`)
+
+          // Stop retrying once the record exists
+          if (latestStatus !== 'none') break
+
+          attempt++
+          await new Promise((resolve) => setTimeout(resolve, delay))
         }
-
-        const data = await res.json()
-        const latestStatus = data?.status || 'none'
-        console.log(`📬 Latest alert status for ${cleanEmail}: ${latestStatus}`)
 
         // ✅ Redirect logic
         if (latestStatus === 'pending_payment') {
-          // Redirect to upgrade page if user has no credits
+          console.log('💳 Redirecting user to /upgrade...')
           router.replace('/upgrade')
-        } else {
-          // Otherwise, show thank-you screen
-          setStatus(latestStatus)
+          return
         }
+
+        console.log('✅ Showing thank-you screen.')
+        setStatus(latestStatus)
       } catch (err) {
         console.error('❌ Error checking latest alert status:', err)
         setStatus('active') // fallback to thank-you
@@ -59,7 +71,7 @@ function AlertSubmittedInner() {
       }
     }
 
-    checkLatestAlert()
+    checkLatestAlertWithRetry()
   }, [params, router])
 
   // 🌀 Loading screen
