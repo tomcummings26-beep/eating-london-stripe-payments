@@ -12,51 +12,62 @@ function AlertSubmittedInner() {
   const [status, setStatus] = useState<string | null>(null)
 
   useEffect(() => {
-    async function checkLatestAlertWithRetry() {
+    async function checkLatestAlertWithSmartRetry() {
       try {
         const email = params.get('email')
-
         if (!email) {
           console.warn('⚠️ No email param provided — showing thank-you by default.')
-          setStatus('active') // safe fallback
+          setStatus('active')
           setLoading(false)
           return
         }
 
         const cleanEmail = email.trim().toLowerCase()
-        const maxAttempts = 5 // retry up to 5 times
-        const delay = 1000 // 1s between retries
-        let attempt = 0
-        let latestStatus = 'none'
+        const baseUrl = process.env.NEXT_PUBLIC_ALERTS_API_BASE_URL
 
-        // 🔁 Retry loop — wait for Mongo insert to exist
+        // 1️⃣ Get the current latest alert before redirect (so we know what's "old")
+        const prevRes = await fetch(`${baseUrl}/api/alerts/latest?email=${encodeURIComponent(cleanEmail)}`)
+        const prevData = await prevRes.json()
+        const prevStatus = prevData?.status || 'none'
+        const prevCreatedAt = prevData?.createdAt || null
+
+        console.log(`📦 Previous alert: status=${prevStatus}, createdAt=${prevCreatedAt || 'none'}`)
+
+        // 2️⃣ Retry logic to detect *new* alert or pending_payment
+        const maxAttempts = 7
+        const delay = 1000
+        let attempt = 0
+        let latestStatus = prevStatus
+        let latestCreatedAt = prevCreatedAt
+
         while (attempt < maxAttempts) {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_ALERTS_API_BASE_URL}/api/alerts/latest?email=${encodeURIComponent(
-              cleanEmail
-            )}`
+          const res = await fetch(`${baseUrl}/api/alerts/latest?email=${encodeURIComponent(cleanEmail)}`)
+          const data = await res.json()
+
+          latestStatus = data?.status || 'none'
+          latestCreatedAt = data?.createdAt || null
+
+          console.log(
+            `🔁 [Attempt ${attempt + 1}] status=${latestStatus}, createdAt=${latestCreatedAt || 'none'}`
           )
 
-          if (!res.ok) {
-            console.error('⚠️ Failed to fetch latest alert status:', res.status)
+          // ✅ Conditions to stop waiting:
+          //  - pending_payment (always redirect)
+          //  - new alert inserted (different createdAt)
+          if (
+            latestStatus === 'pending_payment' ||
+            (latestCreatedAt && latestCreatedAt !== prevCreatedAt)
+          ) {
             break
           }
 
-          const data = await res.json()
-          latestStatus = data?.status || 'none'
-
-          console.log(`🔁 [Attempt ${attempt + 1}] Latest alert for ${cleanEmail}: ${latestStatus}`)
-
-          // Stop retrying once the record exists
-          if (latestStatus !== 'none') break
-
           attempt++
-          await new Promise((resolve) => setTimeout(resolve, delay))
+          await new Promise((r) => setTimeout(r, delay))
         }
 
-        // ✅ Redirect logic
+        // 3️⃣ Decide based on final state
         if (latestStatus === 'pending_payment') {
-          console.log('💳 Redirecting user to /upgrade...')
+          console.log('💳 Redirecting to /upgrade')
           router.replace('/upgrade')
           return
         }
@@ -65,16 +76,16 @@ function AlertSubmittedInner() {
         setStatus(latestStatus)
       } catch (err) {
         console.error('❌ Error checking latest alert status:', err)
-        setStatus('active') // fallback to thank-you
+        setStatus('active')
       } finally {
         setLoading(false)
       }
     }
 
-    checkLatestAlertWithRetry()
+    checkLatestAlertWithSmartRetry()
   }, [params, router])
 
-  // 🌀 Loading screen
+  // 🌀 Loading state
   if (loading) {
     return (
       <div className="p-10 text-center text-gray-500 animate-pulse">
@@ -83,7 +94,7 @@ function AlertSubmittedInner() {
     )
   }
 
-  // 💳 Redirect case handled above — just render thank-you for everything else
+  // ✅ Default thank-you view
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-neutral-50 px-6 text-center">
       <Link href="/" className="mb-8 flex items-center">
