@@ -10,13 +10,19 @@ export default function LayoutClientWrapper({
 }) {
   const pathname = usePathname()
 
-  // Hide the global nav on dashboard-related routes
-  const hideNav =
-    pathname.startsWith('/dashboard') ||
-    pathname.startsWith('/billing') ||
-    pathname.startsWith('/settings') ||
-    pathname.startsWith('/alerts') ||
-    pathname.startsWith('/login')
+  // Hide nav if the route starts with any of these
+  const hideNavPatterns = [
+    '/dashboard',
+    '/billing',
+    '/settings',
+    '/alerts',
+    '/login',
+    '/account',
+  ]
+
+  const hideNav = hideNavPatterns.some((path) =>
+    pathname?.startsWith(path)
+  )
 
   return (
     <>
