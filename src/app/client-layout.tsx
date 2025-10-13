@@ -3,21 +3,24 @@
 import Navigation from '../components/Navigation'
 import { createBrowserSupabaseClient } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { usePathname } from 'next/navigation'
 import { useState, ReactNode } from 'react'
 
 type Props = {
   children: ReactNode
 }
 
-// ✅ Move createBrowserSupabaseClient OUTSIDE the component
-// so it persists between navigations / reloads
+// ✅ Create Supabase client once (persists between reloads)
 const supabaseClient = createBrowserSupabaseClient()
 
 export default function ClientLayout({ children }: Props) {
+  const pathname = usePathname()
+  const hideNav = pathname.startsWith('/dashboard')
+
   return (
     <SessionContextProvider supabaseClient={supabaseClient}>
-      <Navigation />
-      <main className="pt-16">{children}</main>
+      {!hideNav && <Navigation />}
+      <main className={!hideNav ? 'pt-16' : ''}>{children}</main>
     </SessionContextProvider>
   )
 }
