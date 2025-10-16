@@ -29,6 +29,12 @@ function AlertSubmittedInner() {
         }
 
         const cleanEmail = decodeURIComponent(email.trim().toLowerCase())
+
+        // 🆕 Store email locally for later Stripe checkout (Upgrade page)
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('alert_email', cleanEmail)
+        }
+
         const baseUrl = process.env.NEXT_PUBLIC_ALERTS_API_BASE_URL
 
         // 1️⃣ Get the current latest alert
