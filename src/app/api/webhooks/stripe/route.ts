@@ -49,6 +49,7 @@ export async function POST(req: Request) {
       // 🧠 Determine how many credits to add
       let creditsToAdd = 0
       if (priceId === process.env.STRIPE_PRICE_ONE_ALERT) creditsToAdd = 1
+      if (priceId === process.env.STRIPE_PRICE_THREE_ALERTS) creditsToAdd = 3
       if (priceId === process.env.STRIPE_PRICE_FIVE_ALERTS) creditsToAdd = 5
       if (priceId === process.env.STRIPE_PRICE_UNLIMITED) creditsToAdd = 9999
 
