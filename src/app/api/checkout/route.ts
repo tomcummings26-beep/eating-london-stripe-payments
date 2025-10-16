@@ -13,22 +13,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing priceId' }, { status: 400 })
     }
 
-    // 🧠 Automatically choose subscription or payment mode
+    // 🧠 Automatically choose subscription or one-time mode
     const isSubscription = [
       process.env.NEXT_PUBLIC_STRIPE_PRICE_UNLIMITED,
     ].includes(priceId)
+
+    // 🧩 Clean email + use it consistently everywhere
+    const alertEmail = email?.trim().toLowerCase() || 'unknown'
 
     // ✅ Create Checkout Session
     const session = await stripe.checkout.sessions.create({
       mode: isSubscription ? 'subscription' : 'payment',
       customer: customerId || undefined,
-      customer_email: email || undefined,
+      customer_email: alertEmail, // pre-fills checkout email
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/thank-you`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/upgrade?status=cancel`,
+
+      // ✅ include original alert email for webhook mapping
       metadata: {
         price_id: priceId,
+        alert_email: alertEmail,
       },
     })
 
@@ -38,3 +44,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
+
