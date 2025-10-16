@@ -28,11 +28,11 @@ export default function UpgradePage() {
 
       {/* Pricing Cards */}
       <section className="grid gap-6 md:grid-cols-3 max-w-5xl w-full">
-        {/* 1 Alert */}
+        {/* 3 Alerts */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition transform">
-          <h2 className="text-xl font-semibold mb-2">Single Alert</h2>
+          <h2 className="text-xl font-semibold mb-2">3 Alerts</h2>
           <p className="text-gray-600 mb-4">Perfect for one-off bookings or last-minute checks.</p>
-          <p className="text-4xl font-bold mb-6">£1</p>
+          <p className="text-4xl font-bold mb-6">£2.99</p>
 
           <ul className="text-sm text-gray-700 space-y-2 mb-6">
             <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>One restaurant search</li>
@@ -41,10 +41,10 @@ export default function UpgradePage() {
           </ul>
 
           <button
-            onClick={() => buyAlert(process.env.NEXT_PUBLIC_STRIPE_PRICE_ONE_ALERT!)}
+            onClick={() => buyAlert(process.env.NEXT_PUBLIC_STRIPE_PRICE_THREE_ALERTS!)}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition"
           >
-            Buy 1 Alert
+            Buy 3 Alerts
           </button>
         </div>
 
@@ -76,7 +76,7 @@ export default function UpgradePage() {
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition transform">
           <h2 className="text-xl font-semibold mb-2">Unlimited Alerts</h2>
           <p className="text-gray-600 mb-4">Ideal for serious foodies or concierge-style planning.</p>
-          <p className="text-4xl font-bold mb-6">£4.99<span className="text-base font-medium text-gray-600">/month</span></p>
+          <p className="text-4xl font-bold mb-6">£5.99<span className="text-base font-medium text-gray-600">/month</span></p>
 
           <ul className="text-sm text-gray-700 space-y-2 mb-6">
             <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Unlimited restaurant monitoring</li>
