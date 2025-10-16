@@ -35,9 +35,9 @@ export default function UpgradePage() {
           <p className="text-4xl font-bold mb-6">£2.99</p>
 
           <ul className="text-sm text-gray-700 space-y-2 mb-6">
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>One restaurant search</li>
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Instant email alert</li>
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Valid for 7 days</li>
+            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Scan Multiple Restaurants</li>
+            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Instant email and Whatsapp alerts</li>
+            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Valid for 30 days</li>
           </ul>
 
           <button
@@ -59,9 +59,9 @@ export default function UpgradePage() {
           <p className="text-4xl font-bold mb-6">£3.99</p>
 
           <ul className="text-sm text-gray-700 space-y-2 mb-6">
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Covers up to 5 restaurants</li>
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Instant SMS & email alerts</li>
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Flexible time windows</li>
+            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Scan Multiple Restaurants</li>
+            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Instant email and Whatsapp alerts</li>
+            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Falid for 30 Days</li>
           </ul>
 
           <button
@@ -75,12 +75,13 @@ export default function UpgradePage() {
         {/* Unlimited */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition transform">
           <h2 className="text-xl font-semibold mb-2">Unlimited Alerts</h2>
-          <p className="text-gray-600 mb-4">Ideal for serious foodies or concierge-style planning.</p>
+          <p className="text-gray-600 mb-4">Ideal for serious foodies & member insights.</p>
           <p className="text-4xl font-bold mb-6">£5.99<span className="text-base font-medium text-gray-600">/month</span></p>
 
           <ul className="text-sm text-gray-700 space-y-2 mb-6">
             <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Unlimited restaurant monitoring</li>
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Real-time alerts 24/7</li>
+            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Instant email and Whatsapp alerts</li>
+            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Weekly email with rare finds</li>
             <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Cancel anytime</li>
           </ul>
 
@@ -99,19 +100,6 @@ export default function UpgradePage() {
           “I finally got a Saturday booking at Mountain and Brat — this alert system actually works.”
         </p>
         <p className="text-gray-500 text-sm">— Emily R, London</p>
-      </section>
-
-      {/* CTA Footer */}
-      <section className="mt-20 text-center">
-        <h3 className="text-2xl font-semibold mb-3">Still deciding?</h3>
-        <p className="text-gray-600 mb-6">Start small — your first alert could land your next Michelin dinner.</p>
-        <button
-          onClick={() => buyAlert(process.env.NEXT_PUBLIC_STRIPE_PRICE_ONE_ALERT!)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition"
-        >
-          Try 1 Alert Now
-        </button>
-      </section>
     </main>
   )
 }
