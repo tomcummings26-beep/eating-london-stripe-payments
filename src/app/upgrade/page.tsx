@@ -100,6 +100,7 @@ export default function UpgradePage() {
           “I finally got a Saturday booking at Mountain and Brat — this alert system actually works.”
         </p>
         <p className="text-gray-500 text-sm">— Emily R, London</p>
+        </section> 
     </main>
   )
 }
