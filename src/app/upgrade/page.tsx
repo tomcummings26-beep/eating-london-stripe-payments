@@ -4,11 +4,18 @@ import { Check, Star } from 'lucide-react'
 
 export default function UpgradePage() {
   const buyAlert = async (priceId: string) => {
+    const storedEmail =
+      typeof window !== 'undefined' ? localStorage.getItem('alert_email') : null
+
     const res = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ priceId }),
+      body: JSON.stringify({
+        priceId,
+        email: storedEmail, // ✅ ensures same email is used for Stripe checkout
+      }),
     })
+
     const { url } = await res.json()
     window.location.href = url
   }
@@ -21,8 +28,9 @@ export default function UpgradePage() {
           Never miss your next reservation 🍽️
         </h1>
         <p className="text-lg text-gray-600 mb-6">
-          You've used your free Alert - Add more credits and we'll notify when your favourite London restaurants open up tables.  
-          Choose the option that fits your appetite.
+          You've used your free Alert - Add more credits and we'll notify when
+          your favourite London restaurants open up tables. Choose the option
+          that fits your appetite.
         </p>
       </section>
 
@@ -31,17 +39,30 @@ export default function UpgradePage() {
         {/* 3 Alerts */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition transform">
           <h2 className="text-xl font-semibold mb-2">3 Alerts</h2>
-          <p className="text-gray-600 mb-4">Perfect for one-off bookings or last-minute checks.</p>
+          <p className="text-gray-600 mb-4">
+            Perfect for one-off bookings or last-minute checks.
+          </p>
           <p className="text-4xl font-bold mb-6">£2.99</p>
 
           <ul className="text-sm text-gray-700 space-y-2 mb-6">
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Scan Multiple Restaurants</li>
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Instant email and Whatsapp alerts</li>
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Valid for 30 days</li>
+            <li className="flex items-center gap-2">
+              <Check className="text-green-500" size={16} />
+              Scan Multiple Restaurants
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="text-green-500" size={16} />
+              Instant email and Whatsapp alerts
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="text-green-500" size={16} />
+              Valid for 30 days
+            </li>
           </ul>
 
           <button
-            onClick={() => buyAlert(process.env.NEXT_PUBLIC_STRIPE_PRICE_THREE_ALERTS!)}
+            onClick={() =>
+              buyAlert(process.env.NEXT_PUBLIC_STRIPE_PRICE_THREE_ALERTS!)
+            }
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition"
           >
             Buy 3 Alerts
@@ -55,17 +76,30 @@ export default function UpgradePage() {
           </div>
 
           <h2 className="text-xl font-semibold mb-2">5 Alerts Pack</h2>
-          <p className="text-gray-600 mb-4">Best for regular diners tracking multiple spots.</p>
+          <p className="text-gray-600 mb-4">
+            Best for regular diners tracking multiple spots.
+          </p>
           <p className="text-4xl font-bold mb-6">£3.99</p>
 
           <ul className="text-sm text-gray-700 space-y-2 mb-6">
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Scan Multiple Restaurants</li>
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Instant email and Whatsapp alerts</li>
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Falid for 30 Days</li>
+            <li className="flex items-center gap-2">
+              <Check className="text-green-500" size={16} />
+              Scan Multiple Restaurants
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="text-green-500" size={16} />
+              Instant email and Whatsapp alerts
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="text-green-500" size={16} />
+              Valid for 30 Days
+            </li>
           </ul>
 
           <button
-            onClick={() => buyAlert(process.env.NEXT_PUBLIC_STRIPE_PRICE_FIVE_ALERTS!)}
+            onClick={() =>
+              buyAlert(process.env.NEXT_PUBLIC_STRIPE_PRICE_FIVE_ALERTS!)
+            }
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition flex justify-center items-center gap-2"
           >
             <Star size={18} /> Buy 5 Alerts
@@ -75,18 +109,39 @@ export default function UpgradePage() {
         {/* Unlimited */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition transform">
           <h2 className="text-xl font-semibold mb-2">Unlimited Alerts</h2>
-          <p className="text-gray-600 mb-4">Ideal for serious foodies & member insights.</p>
-          <p className="text-4xl font-bold mb-6">£5.99<span className="text-base font-medium text-gray-600">/month</span></p>
+          <p className="text-gray-600 mb-4">
+            Ideal for serious foodies & member insights.
+          </p>
+          <p className="text-4xl font-bold mb-6">
+            £5.99
+            <span className="text-base font-medium text-gray-600">
+              /month
+            </span>
+          </p>
 
           <ul className="text-sm text-gray-700 space-y-2 mb-6">
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Unlimited restaurant monitoring</li>
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Instant email and Whatsapp alerts</li>
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Weekly email with rare finds</li>
-            <li className="flex items-center gap-2"><Check className="text-green-500" size={16}/>Cancel anytime</li>
+            <li className="flex items-center gap-2">
+              <Check className="text-green-500" size={16} />
+              Unlimited restaurant monitoring
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="text-green-500" size={16} />
+              Instant email and Whatsapp alerts
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="text-green-500" size={16} />
+              Weekly email with rare finds
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="text-green-500" size={16} />
+              Cancel anytime
+            </li>
           </ul>
 
           <button
-            onClick={() => buyAlert(process.env.NEXT_PUBLIC_STRIPE_PRICE_UNLIMITED!)}
+            onClick={() =>
+              buyAlert(process.env.NEXT_PUBLIC_STRIPE_PRICE_UNLIMITED!)
+            }
             className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium transition"
           >
             Subscribe Monthly
@@ -97,10 +152,12 @@ export default function UpgradePage() {
       {/* Social Proof */}
       <section className="mt-20 text-center max-w-2xl">
         <p className="text-lg text-gray-700 mb-4 italic">
-          “I finally got a Saturday booking at Mountain and Brat — this alert system actually works.”
+          “I finally got a Saturday booking at Mountain and Brat — this alert
+          system actually works.”
         </p>
         <p className="text-gray-500 text-sm">— Emily R, London</p>
-        </section> 
+      </section>
     </main>
   )
 }
+
