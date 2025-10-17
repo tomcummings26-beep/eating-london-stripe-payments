@@ -60,7 +60,7 @@ export default function UpgradePage() {
           Choose the option that fits your appetite.
         </p>
         <p className="text-sm text-gray-500">
-          Logged in as <span className="font-medium">{email}</span>
+          Using alert email <span className="font-medium">{email}</span>
         </p>
       </section>
 
