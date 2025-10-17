@@ -1,18 +1,46 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Check, Star } from 'lucide-react'
 
 export default function UpgradePage() {
+  const [email, setEmail] = useState<string | null>(null)
+  const [emailInput, setEmailInput] = useState('')
+
+  useEffect(() => {
+    // Load stored email if available
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('alert_email')
+      if (stored) setEmail(stored)
+    }
+  }, [])
+
+  const handleSaveEmail = () => {
+    if (!emailInput.includes('@')) {
+      alert('Please enter a valid email address.')
+      return
+    }
+    localStorage.setItem('alert_email', emailInput.trim().toLowerCase())
+    setEmail(emailInput.trim().toLowerCase())
+  }
+
   const buyAlert = async (priceId: string) => {
     const storedEmail =
-      typeof window !== 'undefined' ? localStorage.getItem('alert_email') : null
+      typeof window !== 'undefined'
+        ? localStorage.getItem('alert_email')
+        : null
+
+    if (!storedEmail) {
+      alert('Please enter your email before purchasing.')
+      return
+    }
 
     const res = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         priceId,
-        email: storedEmail, // ✅ ensures same email is used for Stripe checkout
+        email: storedEmail, // ✅ ensures email always passed to Stripe
       }),
     })
 
@@ -23,15 +51,39 @@ export default function UpgradePage() {
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col items-center px-6 py-16">
       {/* Hero Section */}
-      <section className="max-w-2xl text-center mb-12">
+      <section className="max-w-2xl text-center mb-10">
         <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
           Never miss your next reservation 🍽️
         </h1>
         <p className="text-lg text-gray-600 mb-6">
-          You've used your free Alert - Add more credits and we'll notify when
-          your favourite London restaurants open up tables. Choose the option
-          that fits your appetite.
+          Add more credits and we'll notify you when your favourite London
+          restaurants open up tables. Choose the option that fits your appetite.
         </p>
+
+        {/* 🆕 Email Capture (only shows if missing) */}
+        {!email && (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-4">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={emailInput}
+              onChange={(e) => setEmailInput(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={handleSaveEmail}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+              Continue
+            </button>
+          </div>
+        )}
+
+        {email && (
+          <p className="text-sm text-gray-500 mt-2">
+            Using alert email: <span className="font-medium">{email}</span>
+          </p>
+        )}
       </section>
 
       {/* Pricing Cards */}
@@ -114,9 +166,7 @@ export default function UpgradePage() {
           </p>
           <p className="text-4xl font-bold mb-6">
             £5.99
-            <span className="text-base font-medium text-gray-600">
-              /month
-            </span>
+            <span className="text-base font-medium text-gray-600">/month</span>
           </p>
 
           <ul className="text-sm text-gray-700 space-y-2 mb-6">
@@ -160,4 +210,5 @@ export default function UpgradePage() {
     </main>
   )
 }
+
 
