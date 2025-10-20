@@ -34,7 +34,7 @@ export default function Navigation() {
           {/* Desktop links (LEFT-ALIGNED) */}
           <div className="hidden md:flex items-center gap-8">
             <Link
-              href="/createalert"
+              href="https://eating.london/createalert"
               className="text-[15px] font-medium tracking-tight text-[#0099FF] hover:opacity-80 transition-opacity"
             >
               Create Alert
@@ -48,7 +48,7 @@ export default function Navigation() {
             </Link>
 
             <Link
-              href="/learn-more"
+              href="https://eating.london/learnmore"
               className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
             >
               Learn More
