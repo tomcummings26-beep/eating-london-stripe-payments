@@ -1,75 +1,17 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { useState } from 'react'
-import { supabase } from '@/lib/supabaseClient'
-import { useSession } from '@/lib/hooks/useSession'
 import { X, Menu } from 'lucide-react'
 
 export default function Navigation() {
-  const router = useRouter()
-  const session = useSession()
   const [menuOpen, setMenuOpen] = useState(false)
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
-  }
-
-  const navLinks = (
-    <>
-      <Link
-        href="https://eating.london/createalert"
-        onClick={() => setMenuOpen(false)}
-        className="text-[18px] font-semibold text-[#0099FF] hover:opacity-80 transition-opacity"
-      >
-        Create Alert
-      </Link>
-
-      {session ? (
-        <>
-          <Link
-            href="/dashboard"
-            onClick={() => setMenuOpen(false)}
-            className="text-[18px] font-semibold text-black hover:opacity-80 transition-opacity"
-          >
-            Dashboard
-          </Link>
-          <button
-            onClick={() => {
-              handleLogout()
-              setMenuOpen(false)
-            }}
-            className="text-[18px] font-semibold text-black hover:opacity-80 transition-opacity"
-          >
-            Logout
-          </button>
-        </>
-      ) : (
-        <Link
-          href="/login"
-          onClick={() => setMenuOpen(false)}
-          className="text-[18px] font-semibold text-black hover:opacity-80 transition-opacity"
-        >
-          Login
-        </Link>
-      )}
-
-      <Link
-        href="#"
-        onClick={() => setMenuOpen(false)}
-        className="text-[18px] font-semibold text-black hover:opacity-80 transition-opacity"
-      >
-        Learn More
-      </Link>
-    </>
-  )
 
   return (
     <nav className="fixed top-0 left-0 z-50 w-full bg-white border-b border-black/10">
-      <div className="flex h-[64px] items-center justify-between px-[24px]">
+      <div className="flex h-[64px] items-center justify-between px-6">
+        {/* Logo */}
         <Link href="/" className="flex items-center">
           <Image
             src="/logo-eating-london.svg"
@@ -80,71 +22,65 @@ export default function Navigation() {
           />
         </Link>
 
-        <div className="hidden md:flex gap-8 items-center text-[15px] font-medium">
+        {/* Hamburger / Close icon (mobile) */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden text-gray-700 hover:text-black transition"
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? <X size={26} /> : <Menu size={24} />}
+        </button>
+
+        {/* Desktop links */}
+        <div className="hidden md:flex gap-8 items-center">
           <Link
-            href="https://eating.london/createalert"
-            className="text-[15px] font-medium text-[#0099FF] hover:opacity-80 transition-opacity"
+            href="/createalert"
+            className="text-[15px] font-medium tracking-tight text-[#0099FF] hover:opacity-80 transition-opacity"
           >
             Create Alert
           </Link>
-
-          {session ? (
-            <>
-              <Link
-                href="/dashboard"
-                className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
-              >
-                Dashboard
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link
-              href="/login"
-              className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
-            >
-              Login
-            </Link>
-          )}
-
           <Link
-            href="#"
+            href="/dashboard"
+            className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/learn-more"
             className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
           >
             Learn More
           </Link>
         </div>
-
-        {/* Mobile Toggle */}
-        <button
-          className="md:hidden p-2"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
       </div>
 
-      {/* Mobile Slide-in Overlay */}
-      <div
-        className={`fixed inset-0 z-40 bg-white flex flex-col items-center justify-center gap-8 text-center transform transition-transform duration-300 ease-in-out ${
-          menuOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
-        <button
-          onClick={() => setMenuOpen(false)}
-          className="absolute top-6 right-6"
-          aria-label="Close menu"
-        >
-          <X size={28} />
-        </button>
-        {navLinks}
-      </div>
+      {/* Mobile overlay menu — pixel matched to Framer eating.london */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-40 bg-white flex flex-col items-start px-6 pt-[88px] space-y-[28px] md:hidden transition-all">
+          <Link
+            href="/createalert"
+            onClick={() => setMenuOpen(false)}
+            className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-[#0099FF]"
+          >
+            Create Alert
+          </Link>
+          <Link
+            href="/dashboard"
+            onClick={() => setMenuOpen(false)}
+            className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
+          >
+            Dashboard
+          </Link>
+          <Link
+            href="/learn-more"
+            onClick={() => setMenuOpen(false)}
+            className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
+          >
+            Learn More
+          </Link>
+        </div>
+      )}
     </nav>
   )
 }
+
