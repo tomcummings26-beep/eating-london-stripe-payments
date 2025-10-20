@@ -4,25 +4,77 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
 import { X, Menu } from 'lucide-react'
+import { supabase } from '@/lib/supabaseClient'
+import { useSession } from '@/lib/hooks/useSession'
 
 export default function Navigation() {
+  const { session } = useSession()
   const [menuOpen, setMenuOpen] = useState(false)
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    setMenuOpen(false)
+    // no router push here; nav is global and pages handle redirects as needed
+  }
 
   return (
     <nav className="fixed top-0 left-0 z-50 w-full bg-white border-b border-black/10">
       <div className="flex h-[64px] items-center justify-between px-6">
-        {/* Logo */}
-        <Link href="/" className="flex items-center">
-          <Image
-            src="/logo-eating-london.svg"
-            alt="eating.london"
-            width={140}
-            height={40}
-            priority
-          />
-        </Link>
+        {/* Left cluster: logo + (desktop) links */}
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo-eating-london.svg"
+              alt="eating.london"
+              width={140}
+              height={40}
+              priority
+            />
+          </Link>
 
-        {/* Hamburger / Close icon (mobile) */}
+          {/* Desktop links (LEFT-ALIGNED) */}
+          <div className="hidden md:flex items-center gap-8">
+            <Link
+              href="/createalert"
+              className="text-[15px] font-medium tracking-tight text-[#0099FF] hover:opacity-80 transition-opacity"
+            >
+              Create Alert
+            </Link>
+
+            {session ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
+              >
+                Login
+              </Link>
+            )}
+
+            <Link
+              href="#"
+              className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
+            >
+              Learn More
+            </Link>
+          </div>
+        </div>
+
+        {/* Right: mobile toggle */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className="md:hidden text-gray-700 hover:text-black transition"
@@ -30,33 +82,34 @@ export default function Navigation() {
         >
           {menuOpen ? <X size={26} /> : <Menu size={24} />}
         </button>
-
-        {/* Desktop links */}
-        <div className="hidden md:flex gap-8 items-center">
-          <Link
-            href="/createalert"
-            className="text-[15px] font-medium tracking-tight text-[#0099FF] hover:opacity-80 transition-opacity"
-          >
-            Create Alert
-          </Link>
-          <Link
-            href="/dashboard"
-            className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/learn-more"
-            className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
-          >
-            Learn More
-          </Link>
-        </div>
       </div>
 
-      {/* Mobile overlay menu — pixel matched to Framer eating.london */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-40 bg-white flex flex-col items-start px-6 pt-[88px] space-y-[28px] md:hidden transition-all">
+      {/* Mobile overlay (pixel-matched to Framer) */}
+      <div
+        className={`fixed inset-0 z-40 bg-white md:hidden transform transition-transform duration-300 ease-in-out ${
+          menuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        {/* Top row: brand + close */}
+        <div className="h-[64px] px-6 flex items-center justify-between border-b border-black/10">
+          <Image
+            src="/logo-eating-london.svg"
+            alt="eating.london"
+            width={140}
+            height={40}
+            priority
+          />
+          <button
+            onClick={() => setMenuOpen(false)}
+            aria-label="Close menu"
+            className="text-gray-700 hover:text-black transition"
+          >
+            <X size={26} />
+          </button>
+        </div>
+
+        {/* Menu links */}
+        <div className="flex flex-col items-start px-6 pt-[24px] space-y-[28px]">
           <Link
             href="/createalert"
             onClick={() => setMenuOpen(false)}
@@ -64,13 +117,33 @@ export default function Navigation() {
           >
             Create Alert
           </Link>
-          <Link
-            href="/dashboard"
-            onClick={() => setMenuOpen(false)}
-            className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
-          >
-            Dashboard
-          </Link>
+
+          {session ? (
+            <>
+              <Link
+                href="/dashboard"
+                onClick={() => setMenuOpen(false)}
+                className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="text-left text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => setMenuOpen(false)}
+              className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
+            >
+              Login
+            </Link>
+          )}
+
           <Link
             href="/learn-more"
             onClick={() => setMenuOpen(false)}
@@ -79,8 +152,9 @@ export default function Navigation() {
             Learn More
           </Link>
         </div>
-      )}
+      </div>
     </nav>
   )
 }
+
 
