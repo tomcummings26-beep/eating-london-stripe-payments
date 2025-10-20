@@ -109,7 +109,7 @@ export default function Navigation() {
         {/* Menu links */}
         <div className="flex flex-col items-start px-6 pt-[24px] space-y-[28px]">
           <Link
-            href="/createalert"
+            href="https://eating.london/createalert"
             onClick={() => setMenuOpen(false)}
             className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-[#0099FF]"
           >
@@ -125,7 +125,7 @@ export default function Navigation() {
           </Link>
 
           <Link
-            href="/learn-more"
+            href="https://eating.london/learnmore"
             onClick={() => setMenuOpen(false)}
             className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
           >
