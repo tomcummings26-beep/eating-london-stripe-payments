@@ -14,7 +14,6 @@ export default function Navigation() {
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setMenuOpen(false)
-    // no router push here; nav is global and pages handle redirects as needed
   }
 
   return (
@@ -41,21 +40,27 @@ export default function Navigation() {
               Create Alert
             </Link>
 
+            <Link
+              href="/dashboard"
+              className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
+            >
+              Dashboard
+            </Link>
+
+            <Link
+              href="/learn-more"
+              className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
+            >
+              Learn More
+            </Link>
+
             {session ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
-                >
-                  Logout
-                </button>
-              </>
+              <button
+                onClick={handleLogout}
+                className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
+              >
+                Logout
+              </button>
             ) : (
               <Link
                 href="/login"
@@ -64,13 +69,6 @@ export default function Navigation() {
                 Login
               </Link>
             )}
-
-            <Link
-              href="#"
-              className="text-[15px] font-medium text-gray-800 hover:text-black transition-colors"
-            >
-              Learn More
-            </Link>
           </div>
         </div>
 
@@ -84,13 +82,13 @@ export default function Navigation() {
         </button>
       </div>
 
-      {/* Mobile overlay (pixel-matched to Framer) */}
+      {/* Mobile overlay (Framer-matched) */}
       <div
         className={`fixed inset-0 z-40 bg-white md:hidden transform transition-transform duration-300 ease-in-out ${
           menuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        {/* Top row: brand + close */}
+        {/* Top bar */}
         <div className="h-[64px] px-6 flex items-center justify-between border-b border-black/10">
           <Image
             src="/logo-eating-london.svg"
@@ -109,48 +107,53 @@ export default function Navigation() {
         </div>
 
         {/* Menu links */}
-        <div className="flex flex-col items-start px-6 pt-[24px] space-y-[28px]">
-          <Link
-            href="/createalert"
-            onClick={() => setMenuOpen(false)}
-            className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-[#0099FF]"
-          >
-            Create Alert
-          </Link>
-
-          {session ? (
-            <>
-              <Link
-                href="/dashboard"
-                onClick={() => setMenuOpen(false)}
-                className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
-              >
-                Dashboard
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="text-left text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
+        <div className="flex flex-col justify-between h-[calc(100vh-64px)] px-6 pb-8 pt-[24px]">
+          {/* Main links */}
+          <div className="space-y-[28px]">
             <Link
-              href="/login"
+              href="/createalert"
+              onClick={() => setMenuOpen(false)}
+              className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-[#0099FF]"
+            >
+              Create Alert
+            </Link>
+
+            <Link
+              href="/dashboard"
               onClick={() => setMenuOpen(false)}
               className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
             >
-              Login
+              Dashboard
             </Link>
-          )}
 
-          <Link
-            href="/learn-more"
-            onClick={() => setMenuOpen(false)}
-            className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
-          >
-            Learn More
-          </Link>
+            <Link
+              href="/learn-more"
+              onClick={() => setMenuOpen(false)}
+              className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
+            >
+              Learn More
+            </Link>
+          </div>
+
+          {/* Bottom account action */}
+          <div className="border-t border-black/10 pt-6">
+            {session ? (
+              <button
+                onClick={handleLogout}
+                className="text-[20px] font-medium tracking-[-0.02em] text-gray-700 hover:text-black"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMenuOpen(false)}
+                className="text-[20px] font-medium tracking-[-0.02em] text-gray-700 hover:text-black"
+              >
+                Login
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </nav>
