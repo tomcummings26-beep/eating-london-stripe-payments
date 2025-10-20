@@ -2,15 +2,15 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { supabase } from '@/lib/supabase/client'
+import { useSession } from '@/lib/hooks/useSession'
 import { X, Menu } from 'lucide-react'
 
 export default function Navigation() {
-  const session = useSession()
-  const supabase = useSupabaseClient()
   const router = useRouter()
+  const session = useSession()
   const [menuOpen, setMenuOpen] = useState(false)
 
   const handleLogout = async () => {
@@ -70,7 +70,6 @@ export default function Navigation() {
   return (
     <nav className="fixed top-0 left-0 z-50 w-full bg-white border-b border-black/10">
       <div className="flex h-[64px] items-center justify-between px-[24px]">
-        {/* Logo */}
         <Link href="/" className="flex items-center">
           <Image
             src="/logo-eating-london.svg"
@@ -81,7 +80,6 @@ export default function Navigation() {
           />
         </Link>
 
-        {/* Desktop Links */}
         <div className="hidden md:flex gap-8 items-center text-[15px] font-medium">
           <Link
             href="https://eating.london/createalert"
