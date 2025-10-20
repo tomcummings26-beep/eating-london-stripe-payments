@@ -19,7 +19,7 @@ export default function Navigation() {
   return (
     <nav className="fixed top-0 left-0 z-50 w-full bg-white border-b border-black/10">
       <div className="flex h-[64px] items-center justify-between px-6">
-        {/* Left cluster: logo + (desktop) links */}
+        {/* Left cluster: logo + desktop links */}
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center">
             <Image
@@ -107,57 +107,50 @@ export default function Navigation() {
         </div>
 
         {/* Menu links */}
-        <div className="flex flex-col justify-between h-[calc(100vh-64px)] px-6 pb-8 pt-[24px]">
-          {/* Main links */}
-          <div className="space-y-[28px]">
-            <Link
-              href="/createalert"
-              onClick={() => setMenuOpen(false)}
-              className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-[#0099FF]"
-            >
-              Create Alert
-            </Link>
+        <div className="flex flex-col items-start px-6 pt-[24px] space-y-[28px]">
+          <Link
+            href="/createalert"
+            onClick={() => setMenuOpen(false)}
+            className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-[#0099FF]"
+          >
+            Create Alert
+          </Link>
 
+          <Link
+            href="/dashboard"
+            onClick={() => setMenuOpen(false)}
+            className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
+          >
+            Dashboard
+          </Link>
+
+          <Link
+            href="/learn-more"
+            onClick={() => setMenuOpen(false)}
+            className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
+          >
+            Learn More
+          </Link>
+
+          {/* Logout or Login as last item in the list */}
+          {session ? (
+            <button
+              onClick={handleLogout}
+              className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
+            >
+              Logout
+            </button>
+          ) : (
             <Link
-              href="/dashboard"
+              href="/login"
               onClick={() => setMenuOpen(false)}
               className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
             >
-              Dashboard
+              Login
             </Link>
-
-            <Link
-              href="/learn-more"
-              onClick={() => setMenuOpen(false)}
-              className="text-[22px] font-semibold tracking-[-0.02em] leading-[1.2] text-black"
-            >
-              Learn More
-            </Link>
-          </div>
-
-          {/* Bottom account action */}
-          <div className="border-t border-black/10 pt-6">
-            {session ? (
-              <button
-                onClick={handleLogout}
-                className="text-[20px] font-medium tracking-[-0.02em] text-gray-700 hover:text-black"
-              >
-                Logout
-              </button>
-            ) : (
-              <Link
-                href="/login"
-                onClick={() => setMenuOpen(false)}
-                className="text-[20px] font-medium tracking-[-0.02em] text-gray-700 hover:text-black"
-              >
-                Login
-              </Link>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </nav>
   )
 }
-
-
