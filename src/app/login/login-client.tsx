@@ -1,21 +1,32 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { supabase } from '@/lib/supabaseClient'
-import Image from 'next/image'
-import { useSession } from '@supabase/auth-helpers-react'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
 
 export default function LoginClient() {
-  const session = useSession()
   const router = useRouter()
+  const [session, setSession] = useState<any>(null)
 
-  // Client-side safety net (redirect if session becomes active)
+  // ✅ Fetch current session and listen for changes
   useEffect(() => {
-    if (session) router.push('/dashboard')
-  }, [session, router])
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+      if (data.session) router.push('/dashboard')
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+      if (session) router.push('/dashboard')
+    })
+
+    return () => subscription.unsubscribe()
+  }, [router])
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-neutral-50 px-4">
