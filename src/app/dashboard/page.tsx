@@ -63,15 +63,23 @@ export default function Dashboard() {
         const user = session.user
         const cleanEmail = user.email.trim().toLowerCase()
 
-        const { data: profileData } = await supabase
+        const profilePromise = supabase
           .from('profiles')
           .select('*')
           .ilike('email', cleanEmail)
           .single()
 
-        const alertsRes = await fetch('/api/alerts', {
+        const alertsPromise = fetch('/api/alerts', {
           headers: { Authorization: `Bearer ${session.access_token}` },
         })
+
+        const [profileResponse, alertsRes] = await Promise.all([
+          profilePromise,
+          alertsPromise,
+        ])
+
+        const { data: profileData, error: profileError } = profileResponse
+        if (profileError) throw profileError
 
         if (!alertsRes.ok)
           throw new Error(`API error: ${await alertsRes.text()}`)
