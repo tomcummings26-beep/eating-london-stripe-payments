@@ -92,7 +92,86 @@ export default function Dashboard() {
   }, [session])
 
   if (loading)
-    return <div className="p-8 text-gray-500">Loading dashboard...</div>
+    return (
+      <div className="flex bg-gray-50 flex-col md:flex-row md:min-h-[calc(100vh-64px)]">
+        {/* Mobile Header Skeleton */}
+        <div className="md:hidden flex items-center justify-between p-4 bg-white border-b">
+          <div className="flex items-center gap-3">
+            <div className="h-5 w-32 rounded bg-gray-200 animate-pulse" />
+            <div className="h-4 w-20 rounded bg-gray-200 animate-pulse" />
+          </div>
+          <div className="h-9 w-9 rounded-md bg-gray-200 animate-pulse" />
+        </div>
+
+        {/* Sidebar Skeleton */}
+        <aside className="hidden md:flex md:flex-col gap-6 bg-white border-r w-64 p-6">
+          <div className="space-y-3">
+            <div className="h-4 w-24 rounded bg-gray-200 animate-pulse" />
+            {[...Array(4)].map((_, idx) => (
+              <div
+                key={idx}
+                className="h-10 rounded-md bg-gray-200 animate-pulse"
+              />
+            ))}
+          </div>
+          <div className="mt-auto space-y-3">
+            <div className="h-4 w-28 rounded bg-gray-200 animate-pulse" />
+            <div className="h-10 rounded-md bg-gray-200 animate-pulse" />
+          </div>
+        </aside>
+
+        {/* Main Content Skeleton */}
+        <main className="flex-1 p-6 md:p-10">
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <div className="h-6 w-48 rounded bg-gray-200 animate-pulse" />
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {[...Array(3)].map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="h-28 rounded-xl bg-white shadow-sm border border-gray-200 p-4 flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      <div className="h-4 w-24 rounded bg-gray-200 animate-pulse" />
+                      <div className="h-6 w-20 rounded bg-gray-200 animate-pulse" />
+                    </div>
+                    <div className="h-3 w-16 rounded bg-gray-200 animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="h-5 w-40 rounded bg-gray-200 animate-pulse" />
+                <div className="h-8 w-32 rounded bg-gray-200 animate-pulse" />
+              </div>
+              <div className="space-y-3">
+                {[...Array(3)].map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="h-4 w-48 rounded bg-gray-200 animate-pulse" />
+                      <div className="h-4 w-16 rounded bg-gray-200 animate-pulse" />
+                    </div>
+                    <div className="mt-4 grid gap-3 md:grid-cols-3">
+                      {[...Array(3)].map((_, colIdx) => (
+                        <div
+                          key={colIdx}
+                          className="h-4 w-full rounded bg-gray-200 animate-pulse"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
 
   // ✅ Helpers
   const parseDate = (d?: string | Date) => {
